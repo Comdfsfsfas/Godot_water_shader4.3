@@ -1,0 +1,193 @@
+[gd_scene load_steps=21 format=3 uid="uid://bnp8swjunykp5"]
+
+[ext_resource type="Shader" path="res://scene/lianyi.gdshader" id="1_08bw7"]
+[ext_resource type="Script" path="res://scene/water.gd" id="1_fkypm"]
+[ext_resource type="Shader" uid="uid://brct5j684e35s" path="res://shader/water.tres" id="2_ikhtp"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_ycuj6"]
+sky_horizon_color = Color(0.64625, 0.65575, 0.67075, 1)
+ground_horizon_color = Color(0.64625, 0.65575, 0.67075, 1)
+
+[sub_resource type="Sky" id="Sky_f2f11"]
+sky_material = SubResource("ProceduralSkyMaterial_ycuj6")
+
+[sub_resource type="Environment" id="Environment_ss53l"]
+background_mode = 2
+sky = SubResource("Sky_f2f11")
+tonemap_mode = 2
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_d2xr4"]
+size = Vector2(10, 10)
+subdivide_width = 200
+subdivide_depth = 200
+
+[sub_resource type="ViewportTexture" id="ViewportTexture_q7gpb"]
+viewport_path = NodePath("sim")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_b05ga"]
+resource_local_to_scene = true
+render_priority = 0
+shader = ExtResource("2_ikhtp")
+shader_parameter/ind = -0.105
+shader_parameter/Floa = 0.3
+shader_parameter/qwater = Color(1, 1, 1, 1)
+shader_parameter/dwater = Color(0, 0, 0, 1)
+shader_parameter/sim_tex = SubResource("ViewportTexture_q7gpb")
+
+[sub_resource type="ViewportTexture" id="ViewportTexture_epxcm"]
+viewport_path = NodePath("col")
+
+[sub_resource type="ViewportTexture" id="ViewportTexture_well1"]
+viewport_path = NodePath("d")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_gqh3h"]
+resource_local_to_scene = true
+shader = ExtResource("1_08bw7")
+shader_parameter/phase = 0.18
+shader_parameter/attenuation = 0.995
+shader_parameter/deltaUV = 2.3
+shader_parameter/sim_tex = SubResource("ViewportTexture_well1")
+shader_parameter/col_tex = SubResource("ViewportTexture_epxcm")
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_32rbv"]
+
+[sub_resource type="SphereMesh" id="SphereMesh_pinqx"]
+material = SubResource("StandardMaterial3D_32rbv")
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_hu80e"]
+shading_mode = 0
+albedo_color = Color(1, 0, 0, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_7amec"]
+material = SubResource("StandardMaterial3D_hu80e")
+
+[sub_resource type="Animation" id="Animation_gmkd3"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector3(0, 1.4618, 0)]
+}
+
+[sub_resource type="Animation" id="Animation_1lpbj"]
+resource_name = "move"
+length = 5.0
+loop_mode = 2
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 1, 2, 3, 4, 5),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1),
+"update": 0,
+"values": [Vector3(0, 1.4618, 0), Vector3(0, 0, 0), Vector3(-2.27089, 0, 1.93808), Vector3(2.18486, 0, 2.2557), Vector3(-1.53761, 0, -2.07407), Vector3(0, 0, 0)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_cggdm"]
+_data = {
+"RESET": SubResource("Animation_gmkd3"),
+"move": SubResource("Animation_1lpbj")
+}
+
+[sub_resource type="ViewportTexture" id="ViewportTexture_0o88u"]
+viewport_path = NodePath("sim")
+
+[node name="Water" type="Node3D"]
+script = ExtResource("1_fkypm")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(-0.866023, -0.433016, 0.250001, 0, 0.499998, 0.866027, -0.500003, 0.749999, -0.43301, 0, 0, 0)
+shadow_enabled = true
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_ss53l")
+
+[node name="water" type="MeshInstance3D" parent="."]
+mesh = SubResource("PlaneMesh_d2xr4")
+surface_material_override/0 = SubResource("ShaderMaterial_b05ga")
+
+[node name="sim" type="SubViewport" parent="."]
+render_target_clear_mode = 2
+render_target_update_mode = 4
+
+[node name="ColorRect" type="ColorRect" parent="sim"]
+material = SubResource("ShaderMaterial_gqh3h")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="col" type="SubViewport" parent="."]
+transparent_bg = true
+render_target_clear_mode = 2
+render_target_update_mode = 4
+
+[node name="Camera3D" type="Camera3D" parent="col"]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, -1, 0, 1, -4.37114e-08, 0, -5, 0)
+cull_mask = 2
+projection = 1
+size = 10.0
+far = 5.0
+
+[node name="maincanmera" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.868034, 0.496504, 0, -0.496504, 0.868034, 0, 3.52644, 4.85395)
+cull_mask = 1048573
+
+[node name="ball" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.4618, 0)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="ball"]
+mesh = SubResource("SphereMesh_pinqx")
+
+[node name="MeshInstance3D2" type="MeshInstance3D" parent="ball"]
+layers = 2
+mesh = SubResource("SphereMesh_7amec")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="ball"]
+libraries = {
+"": SubResource("AnimationLibrary_cggdm")
+}
+
+[node name="bo" type="CSGCombiner3D" parent="."]
+
+[node name="CSGBox3D" type="CSGBox3D" parent="bo"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.0716252, -2.26273, -5.43939)
+size = Vector3(11.5809, 5.52545, 1)
+
+[node name="CSGBox3D2" type="CSGBox3D" parent="bo"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.0716252, -2.27759, 5.29668)
+size = Vector3(11.5809, 5.55518, 1)
+
+[node name="CSGBox3D3" type="CSGBox3D" parent="bo"]
+transform = Transform3D(-0.00680672, 0, -0.999977, 0, 1, 0, 0.999977, 0, -0.00680672, 5.21163, -2.23267, -0.0166211)
+size = Vector3(11.5809, 5.46533, 1)
+
+[node name="CSGBox3D4" type="CSGBox3D" parent="bo"]
+transform = Transform3D(-0.00680672, 0, -0.999977, 0, 1, 0, 0.999977, 0, -0.00680672, -5.66864, -2.27759, -0.0166211)
+size = Vector3(11.5809, 5.55518, 1)
+
+[node name="CSGBox3D5" type="CSGBox3D" parent="bo"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.415375, -4.75337, -0.122711)
+size = Vector3(10.8305, 1, 10.9507)
+
+[node name="d" type="SubViewport" parent="."]
+render_target_update_mode = 4
+
+[node name="TextureRect" type="TextureRect" parent="d"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = SubResource("ViewportTexture_0o88u")

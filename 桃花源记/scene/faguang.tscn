@@ -1,0 +1,47 @@
+[gd_scene load_steps=7 format=3 uid="uid://meyvi8xumf4v"]
+
+[ext_resource type="Shader" uid="uid://dkp8g0dipoash" path="res://shader/rim.tres" id="3_4is0l"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_b5s76"]
+sky_horizon_color = Color(0.64625, 0.65575, 0.67075, 1)
+ground_horizon_color = Color(0.64625, 0.65575, 0.67075, 1)
+
+[sub_resource type="Sky" id="Sky_q4s5l"]
+sky_material = SubResource("ProceduralSkyMaterial_b5s76")
+
+[sub_resource type="Environment" id="Environment_hidpp"]
+background_mode = 2
+sky = SubResource("Sky_q4s5l")
+tonemap_mode = 2
+
+[sub_resource type="SphereMesh" id="SphereMesh_rmqa1"]
+radius = 0.25
+height = 0.5
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_0x2qm"]
+render_priority = 0
+shader = ExtResource("3_4is0l")
+shader_parameter/color = Color(0.708731, 0, 0.127978, 1)
+shader_parameter/Fgfgf2 = null
+shader_parameter/df2 = 0.01
+shader_parameter/strong = 3.175
+
+[node name="Node3D" type="Node3D"]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_hidpp")
+
+[node name="sen" type="CSGCombiner3D" parent="."]
+
+[node name="CSGBox3D" type="CSGBox3D" parent="sen"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0770264, 0.018219, 0.0179749)
+size = Vector3(4.66138, 0.316833, 4.81537)
+
+[node name="CSGBox3D2" type="CSGBox3D" parent="sen"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.705943, 0.805454, 0.0316162)
+size = Vector3(0.199097, 1.58423, 3.01392)
+
+[node name="MeshInstance3D2" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.786235, 0.907154, -0.257534)
+mesh = SubResource("SphereMesh_rmqa1")
+surface_material_override/0 = SubResource("ShaderMaterial_0x2qm")
