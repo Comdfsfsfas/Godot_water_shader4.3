@@ -1,1 +1,2 @@
-# Water_shader4.3.2
+# Water_shader4.3
+这是一个成功实现godot水波纹着色器的示例，使用兼容管线可以使用双缓冲，使用forward管线需要另一个subviewport作为储存
